@@ -54,7 +54,7 @@ const args = require('yargs')
       });
       console.table(breakdown, ['metric', 'value', 'timestamp', 'tags']);
     } else {
-      await sendMetricsToDatadog(app, payload);
+      await sendMetricsToDatadog(payload);
     }
   } catch (error) {
     console.error(error);
