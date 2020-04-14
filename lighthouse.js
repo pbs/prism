@@ -19,8 +19,17 @@ const auditKeys = [
 ];
 
 const launchChrome = async ({headless} = {}) => {
+  /* Adding the --no-sandbox flag is a way to have this run smoothly in a container.
+   * Sandboxing acts as another barrier around the JS environment that will prevent any
+   * harm from being done if malicious code were to break out of JS runtime environment.
+   * Docker has its own security measures that mitigate rogue code from executing outside
+   * of the container and we are only ever hitting our own trusted URLs so it's safe to
+   * forgo the chrome sandboxing.
+   *
+   * https://github.com/GoogleChrome/lighthouse-ci/tree/master/docs/recipes/docker-client#--no-sandbox-issues-explained
+   * */
   const launcherOptions = {
-    chromeFlags: headless ? ['--headless'] : [],
+    chromeFlags: headless ? ['--headless', '--no-sandbox'] : [],
   };
   return launcher.launch(launcherOptions);
 };
