@@ -18,6 +18,8 @@ const auditKeys = [
   'unminified-javascript',
 ];
 
+const categoryScoreKeys = ['performance', 'accessibility', 'best-practices', 'seo', 'pwa'];
+
 const launchChrome = async ({headless} = {}) => {
   /* Adding the --no-sandbox flag is a way to have this run smoothly in a container.
    * Sandboxing acts as another barrier around the JS environment that will prevent any
@@ -47,7 +49,11 @@ const runLighthouse = async (url, chrome) => {
     const {id, numericValue} = results.lhr.audits[key];
     return {name: kebabToCamel(id), value: numericValue};
   });
-  return metrics;
+  const categoryScores = categoryScoreKeys.map((key) => {
+    const {id, score} = results.lhr.categories[key];
+    return {name: `categoryScore.${kebabToCamel(id)}`, value: score};
+  });
+  return [...metrics, ...categoryScores];
 };
 
 module.exports = {
