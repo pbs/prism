@@ -1,5 +1,5 @@
 # `prism`
-A node CLI tool to send Google Lighthouse metrics to Datadog.  
+A node CLI tool to send Google Lighthouse metrics to Datadog. 
 
 ## Setup
 Create a `.env` file with the following format:
@@ -28,4 +28,53 @@ Examples:
     node index.js -u https://wuphf.com/ -a wuphf -t tagA:value -t tagB:value
 ```
 
+## What's collected and sent to Datadog?
+
+### Scores
+```javascript
+performance
+accessibility
+best-practices
+seo
+pwa
+```
+
+### Performance Metrics
+```javascript
+firstContentfulPaint
+firstMeaningfulPaint
+firstCPUIdle
+interactive
+speedIndex
+estimatedInputLatency
+totalBlockingTime
+observedNavigationStart
+observedNavigationStartTs
+observedFirstPaint
+observedFirstPaintTs
+observedFirstContentfulPaint
+observedFirstContentfulPaintTs
+observedFirstMeaningfulPaint
+observedFirstMeaningfulPaintTs
+observedLargestContentfulPaint
+observedLargestContentfulPaintTs
+observedTraceEnd
+observedTraceEndTs
+observedLoad
+observedLoadTs
+observedDomContentLoaded
+observedDomContentLoadedTs
+observedFirstVisualChange
+observedFirstVisualChangeTs
+observedLastVisualChange
+observedLastVisualChangeTs
+observedSpeedIndex
+observedSpeedIndexTs
+maxPotentialFid
+timeToFirstByte
+bootupTime
+unminifiedJavascript
+```
+
 *Note:* Reference `example-report.json` for help navigating the data structure that lighthouse uses for generated reports.
+

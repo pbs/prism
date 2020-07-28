@@ -2,21 +2,10 @@ const lighthouse = require('lighthouse');
 const launcher = require('chrome-launcher');
 const {kebabToCamel} = require('./utils');
 
-const auditKeys = [
-  'first-contentful-paint',
-  'first-meaningful-paint',
-  'speed-index',
-  'estimated-input-latency',
-  'total-blocking-time',
-  'max-potential-fid',
-  'time-to-first-byte',
-  'first-cpu-idle',
-  'interactive',
-  'bootup-time',
-  // 'diagnostics',
-  // 'metrics',
-  'unminified-javascript',
-];
+/* Not all metrics that we want to track exist in the "metrics" audit field so we can
+ * specify additional audit keys that we want to pull out of the lighthouse audit JSON.
+ * */
+const additionalAuditKeys = ['max-potential-fid', 'time-to-first-byte', 'bootup-time', 'unminified-javascript'];
 
 const categoryScoreKeys = ['performance', 'accessibility', 'best-practices', 'seo', 'pwa'];
 
@@ -45,15 +34,20 @@ const runLighthouse = async (url, chrome) => {
     },
   };
   const results = await lighthouse(url, options);
-  const metrics = auditKeys.map((key) => {
+
+  const baseMetricObj = results.lhr.audits.metrics.details.items[0];
+  const baseMetrics = Object.entries(baseMetricObj).map(([name, value]) => ({name, value}));
+
+  const additionalMetrics = additionalAuditKeys.map((key) => {
     const {id, numericValue} = results.lhr.audits[key];
     return {name: kebabToCamel(id), value: numericValue};
   });
+
   const categoryScores = categoryScoreKeys.map((key) => {
     const {id, score} = results.lhr.categories[key];
     return {name: `categoryScore.${kebabToCamel(id)}`, value: score};
   });
-  return [...metrics, ...categoryScores];
+  return [...baseMetrics, ...additionalMetrics, ...categoryScores];
 };
 
 module.exports = {
