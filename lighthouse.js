@@ -35,8 +35,11 @@ const runLighthouse = async (url, chrome) => {
   };
   const results = await lighthouse(url, options);
 
-  const baseMetricObj = results.lhr.audits.metrics.details.items[0];
-  const baseMetrics = Object.entries(baseMetricObj).map(([name, value]) => ({name, value}));
+  let baseMetrics = [];
+  if (results.lhr.audits.metrics.details) {
+    const baseMetricObj = results.lhr.audits.metrics.details.items[0];
+    baseMetrics = Object.entries(baseMetricObj).map(([name, value]) => ({name, value}));
+  }
 
   const additionalMetrics = additionalAuditKeys.map((key) => {
     const {id, numericValue} = results.lhr.audits[key];
