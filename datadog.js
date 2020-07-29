@@ -16,7 +16,7 @@ const generateMetricsPayload = (app, lhMetrics, tags = []) => {
 
 const sendMetricsToDatadog = async (payload) => {
   // Only send metrics with values
-  const metricsWithValues = payload.filter((data) => ![undefined, null].includes(data.points[1]));
+  const metricsWithValues = payload.filter((data) => ![undefined, null].includes(data.points[0][1]));
   return new Promise((resolve, reject) => {
     try {
       dapi.metric.send_all(metricsWithValues, (resp) => resolve(resp));
