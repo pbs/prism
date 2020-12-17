@@ -5,7 +5,7 @@ const {kebabToCamel} = require('./utils');
 /* Not all metrics that we want to track exist in the "metrics" audit field so we can
  * specify additional audit keys that we want to pull out of the lighthouse audit JSON.
  * */
-const additionalAuditKeys = ['max-potential-fid', 'time-to-first-byte', 'bootup-time', 'unminified-javascript'];
+const additionalAuditKeys = ['max-potential-fid', 'server-response-time', 'bootup-time', 'unminified-javascript'];
 
 const categoryScoreKeys = ['performance', 'accessibility', 'best-practices', 'seo', 'pwa'];
 
