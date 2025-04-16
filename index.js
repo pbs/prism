@@ -11,7 +11,7 @@ const args = require('yargs')
   })
   .option('app', {
     alias: 'a',
-    description: 'App name used to define the metric namspace',
+    description: 'App name used to define the metric namespace',
     type: 'string',
     demandOption: true,
   })
@@ -45,7 +45,7 @@ const args = require('yargs')
     const payload = generateMetricsPayload(app, metrics, tags);
     if (dryRun) {
       /* The datadog client uses nested arrays which do not print well so to
-       * make the table a little more human readible, we extract the metric value
+       * make the table a little more human readable, we extract the metric value
        * and timestamp into their own fields */
       const breakdown = payload.map((metric) => {
         let [timestamp, value] = metric.points[0];
