@@ -20,7 +20,7 @@ const launchChrome = async ({headless} = {}) => {
    * https://github.com/GoogleChrome/lighthouse-ci/tree/master/docs/recipes/docker-client#--no-sandbox-issues-explained
    * */
   const launcherOptions = {
-    chromeFlags: headless ? ['--headless', '--no-sandbox'] : [],
+    chromeFlags: headless ? ['--headless=new', '--no-sandbox'] : [],
   };
   return launcher.launch(launcherOptions);
 };
