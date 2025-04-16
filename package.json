@@ -5,6 +5,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "chrome-launcher": "^1.1.2",
     "dogapi": "^2.8.4",
     "dotenv": "^8.2.0",
     "lighthouse": "^12.0.0",
