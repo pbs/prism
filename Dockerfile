@@ -1,4 +1,4 @@
-FROM node:12.16.2-buster-slim
+FROM node:22.14-bookworm-slim
 
 RUN apt-get update && apt-get install -y chromium
 
