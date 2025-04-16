@@ -1,6 +1,6 @@
-const lighthouse = require('lighthouse');
-const launcher = require('chrome-launcher');
-const {kebabToCamel} = require('./utils');
+import lighthouse from 'lighthouse';
+import * as launcher from 'chrome-launcher';
+import {kebabToCamel} from './utils.js';
 
 /* Not all metrics that we want to track exist in the "metrics" audit field so we can
  * specify additional audit keys that we want to pull out of the lighthouse audit JSON.
@@ -53,7 +53,7 @@ const runLighthouse = async (url, chrome) => {
   return [...baseMetrics, ...additionalMetrics, ...categoryScores];
 };
 
-module.exports = {
+export {
   launchChrome,
   runLighthouse,
 };
