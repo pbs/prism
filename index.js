@@ -1,5 +1,6 @@
 require('dotenv').config();
 const {launchChrome, runLighthouse} = require('./lighthouse');
+const {collectCompleteMetrics} =  require('./retry');
 const {generateMetricsPayload, sendMetricsToDatadog} = require('./datadog');
 
 const args = require('yargs')
@@ -39,7 +40,7 @@ const args = require('yargs')
     }
 
     const chrome = await launchChrome({headless: true});
-    const metrics = await runLighthouse(url, chrome);
+    const metrics = await collectCompleteMetrics(url, chrome);
     await chrome.kill();
 
     const payload = generateMetricsPayload(app, metrics, tags);
