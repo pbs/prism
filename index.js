@@ -27,12 +27,23 @@ const args = yargs(hideBin(process.argv))
     description: 'Print metric data instead of sending it to datadog',
     type: 'boolean',
   })
+  .option('retry', {
+    description: 'Retry until a set of metrics is successfully captured',
+    type: 'boolean',
+    //TODO add a flag for metrics user wants to collect using retry
+  })
+  .option('debug', {
+    description: 'Enable debug logging',
+    type: 'boolean',
+    default: false,
+  })
   .example('', 'node index.js -u https://wuphf.com/ -a wuphf -t tagA:value -t tagB:value')
-  .help().argv;
+  .help()
+  .parse();
 
 (async () => {
   try {
-    const {url, app, tag: tags, dryRun} = args;
+    const {url, app, tag: tags, dryRun, retry} = args;
 
     if (!dryRun && !process.env.DATADOG_API_KEY) {
       /* An API key is required when actually sending to Datadog
@@ -42,7 +53,9 @@ const args = yargs(hideBin(process.argv))
     }
 
     const chrome = await launchChrome({headless: true});
-    const metrics = await collectCompleteMetrics(url, chrome);
+    const metrics = await (retry
+      ? collectCompleteMetrics(url, chrome)
+      : runLighthouse(url, chrome));
     await chrome.kill();
 
     const payload = generateMetricsPayload(app, metrics, tags);
@@ -63,3 +76,5 @@ const args = yargs(hideBin(process.argv))
     console.error(error);
   }
 })();
+
+export {args};

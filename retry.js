@@ -1,4 +1,5 @@
 import { runLighthouse } from './lighthouse.js';
+import { args } from './index.js';
 
 // metrics in the pbs-prod-lighthouse DataDog dashboard (https://p.datadoghq.com/sb/2wDxt_-83b2c08d23c8b778c497c2aeb3a4ae15)
 const DATADOG_METRICS = [
@@ -44,6 +45,11 @@ const collectCompleteMetrics = async (url, chrome) => {
           };
         }
 
+        //debug: print the metric name and value
+        if (args.debug) {
+          console.log(`In collectCompelteMetrics loop; Metric: ${metric.name}, Value: ${metric.value}`);
+        }
+
         // Add current measurement to array
         completePayload[metric.name].metricArr.push(metric);
 
@@ -80,4 +86,8 @@ const collectCompleteMetrics = async (url, chrome) => {
   return processCompletePayload(completePayload);
 };
 
-// Rest of the code remains unchanged
+// Rest of the code remains unchanged    if (args.debug) {
+    if (args.debug) {
+      console.log(`In processCompletePayload; Metric: ${metricName}, Value: ${aggregatedValue}`);
+    }
+
