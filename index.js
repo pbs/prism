@@ -1,9 +1,11 @@
-require('dotenv').config();
-const {launchChrome, runLighthouse} = require('./lighthouse');
-const {collectCompleteMetrics} =  require('./retry');
-const {generateMetricsPayload, sendMetricsToDatadog} = require('./datadog');
 
-const args = require('yargs')
+import {launchChrome, runLighthouse} from './lighthouse.js';
+import {collectCompleteMetrics} from './retry.js';
+import {generateMetricsPayload, sendMetricsToDatadog} from './datadog.js';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+
+const args = yargs(hideBin(process.argv))
   .option('url', {
     alias: 'u',
     description: 'URL to audit',
