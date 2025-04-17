@@ -6,6 +6,7 @@ const DATADOG_METRICS = [
   'speedIndex',
   'firstContentfulPaint',
   'largestContentfulPaint',
+  'observedLargestContentfulPaint',
   'categoryScore.accessibility',
   'categoryScore.bestPractices',
   'categoryScore.performance'
@@ -25,7 +26,7 @@ const collectCompleteMetrics = async (url, chrome) => {
   while (Date.now() - startTime < timeoutMs) {
     try {
       attemptCount++;
-      console.log(`Attempt ${attemptCount} - ${Math.round((Date.now() - startTime)/1000)}s elapsed`);
+      console.log(`Attempt ${attemptCount} - ${Math.round((Date.now() - startTime))}ms elapsed`);
 
       // Get metrics from lighthouse
       const metrics = await runLighthouse(url, chrome);
@@ -86,8 +87,39 @@ const collectCompleteMetrics = async (url, chrome) => {
   return processCompletePayload(completePayload);
 };
 
-// Rest of the code remains unchanged    if (args.debug) {
+const processCompletePayload = (completePayload) => {
+  /**
+   * Processes the completePayload object, taking an average of all metrics
+   * @param {Object} completePayload - Object containing metrics with their measurement status and values
+   * @returns {Array} Array of processed metrics with aggregated values
+   */
+  const rawLighthousePayload = [];
+
+  for (const metricName in completePayload) {
+    const metricAttempt = completePayload[metricName];
+
+
+
+    const metricValues = metricAttempt.metricArr
+      .map(m => m.value)
+      .filter(value => value !== null && value !== undefined);
+
+    let aggregatedValue = null;
+    if (metricValues.length > 0) {
+      aggregatedValue = metricValues.reduce((sum, val) => sum + val, 0) / metricValues.length;
+    }
+
     if (args.debug) {
       console.log(`In processCompletePayload; Metric: ${metricName}, Value: ${aggregatedValue}`);
     }
 
+    rawLighthousePayload.push({
+      name: metricName,
+      value: aggregatedValue
+    });
+  }
+
+  return rawLighthousePayload;
+};
+
+export { collectCompleteMetrics, processCompletePayload };
