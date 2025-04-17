@@ -1,5 +1,15 @@
 import { runLighthouse } from './lighthouse.js';
 
+// metrics in the pbs-prod-lighthouse DataDog dashboard (https://p.datadoghq.com/sb/2wDxt_-83b2c08d23c8b778c497c2aeb3a4ae15)
+const DATADOG_METRICS = [
+  'speedIndex',
+  'firstContentfulPaint',
+  'largestContentfulPaint',
+  'categoryScore.accessibility',
+  'categoryScore.bestPractices',
+  'categoryScore.performance'
+];
+
 const collectCompleteMetrics = async (url, chrome) => {
   const startTime = Date.now();
   const timeoutMs = 300 * 1000; // 5 minutes
@@ -19,8 +29,13 @@ const collectCompleteMetrics = async (url, chrome) => {
       // Get metrics from lighthouse
       const metrics = await runLighthouse(url, chrome);
 
-      // Update the completePayload with the new metrics
-      metrics.forEach(metric => {
+      // Filter metrics to only those we care about
+      const relevantMetrics = metrics.filter(metric =>
+        DATADOG_METRICS.includes(metric.name)
+      );
+
+      // Update the completePayload with the filtered metrics
+      relevantMetrics.forEach(metric => {
         // Initialize this metric in payload if needed
         if (!completePayload[metric.name]) {
           completePayload[metric.name] = {
@@ -65,31 +80,4 @@ const collectCompleteMetrics = async (url, chrome) => {
   return processCompletePayload(completePayload);
 };
 
-const processCompletePayload = (completePayload) => {
-  const rawLighthousePayload = [];
-
-  for (const metricName in completePayload) {
-    const metricAttempt = completePayload[metricName];
-
-    // Get all valid numeric values for this metric
-    const metricValues = metricAttempt.metricArr
-      .map(m => m.value)
-      .filter(value => value !== null && value !== undefined);
-
-    // Calculate the average value
-    let aggregatedValue = null;
-    if (metricValues.length > 0) {
-      aggregatedValue = metricValues.reduce((sum, val) => sum + val, 0) / metricValues.length;
-    }
-
-    // Add to final payload
-    rawLighthousePayload.push({
-      name: metricName,
-      value: aggregatedValue
-    });
-  }
-
-  return rawLighthousePayload;
-};
-
-export { collectCompleteMetrics };
+// Rest of the code remains unchanged
