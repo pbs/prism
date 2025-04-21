@@ -48,7 +48,7 @@ const collectCompleteMetrics = async (url, chrome) => {
 
         //debug: print the metric name and value
         if (args.debug) {
-          console.log(`In collectCompelteMetrics loop; Metric: ${metric.name}, Value: ${metric.value}`);
+          console.log(`In collectCompleteMetrics loop; Metric: ${metric.name}, Value: ${metric.value}`);
         }
 
         // Add current measurement to array
