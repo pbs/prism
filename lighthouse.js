@@ -1,6 +1,6 @@
-const lighthouse = require('lighthouse');
-const launcher = require('chrome-launcher');
-const {kebabToCamel} = require('./utils');
+import lighthouse from 'lighthouse';
+import * as launcher from 'chrome-launcher';
+import {kebabToCamel} from './utils.js';
 
 /* Not all metrics that we want to track exist in the "metrics" audit field so we can
  * specify additional audit keys that we want to pull out of the lighthouse audit JSON.
@@ -20,7 +20,7 @@ const launchChrome = async ({headless} = {}) => {
    * https://github.com/GoogleChrome/lighthouse-ci/tree/master/docs/recipes/docker-client#--no-sandbox-issues-explained
    * */
   const launcherOptions = {
-    chromeFlags: headless ? ['--headless', '--no-sandbox'] : [],
+    chromeFlags: headless ? ['--headless=new', '--no-sandbox'] : [],
   };
   return launcher.launch(launcherOptions);
 };
@@ -28,7 +28,7 @@ const launchChrome = async ({headless} = {}) => {
 const runLighthouse = async (url, chrome) => {
   const options = {
     port: chrome.port,
-    onlyCatagories: ['performance'],
+    onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo', 'pwa'],
     throttling: {
       cpuSlowdownMultiplier: 4,
     },
@@ -36,24 +36,37 @@ const runLighthouse = async (url, chrome) => {
   const results = await lighthouse(url, options);
 
   let baseMetrics = [];
-  if (results.lhr.audits.metrics.details) {
+  if (results.lhr.audits.metrics?.details?.items?.[0]) {
     const baseMetricObj = results.lhr.audits.metrics.details.items[0];
     baseMetrics = Object.entries(baseMetricObj).map(([name, value]) => ({name, value}));
   }
 
-  const additionalMetrics = additionalAuditKeys.map((key) => {
-    const {id, numericValue} = results.lhr.audits[key];
-    return {name: kebabToCamel(id), value: numericValue};
-  });
+  // Check if each audit key exists before trying to destructure it
+  const additionalMetrics = additionalAuditKeys
+    .filter(key => results.lhr.audits[key])
+    .map((key) => {
+      const audit = results.lhr.audits[key];
+      // Make sure id and numericValue exist, use fallbacks if needed
+      return {
+        name: kebabToCamel(audit.id || key),
+        value: audit.numericValue !== undefined ? audit.numericValue : null
+      };
+    });
 
-  const categoryScores = categoryScoreKeys.map((key) => {
-    const {id, score} = results.lhr.categories[key];
-    return {name: `categoryScore.${kebabToCamel(id)}`, value: score};
-  });
+  const categoryScores = categoryScoreKeys
+    .filter(key => results.lhr.categories[key])
+    .map((key) => {
+      const category = results.lhr.categories[key];
+      return {
+        name: `categoryScore.${kebabToCamel(category.id || key)}`,
+        value: category.score
+      };
+    });
+
   return [...baseMetrics, ...additionalMetrics, ...categoryScores];
 };
 
-module.exports = {
+export {
   launchChrome,
   runLighthouse,
 };

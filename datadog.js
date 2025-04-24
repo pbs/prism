@@ -1,7 +1,7 @@
 // https://brettlangdon.github.io/node-dogapi/
-const dapi = require('dogapi');
+import dogapi from 'dogapi';
 
-dapi.initialize({
+dogapi.initialize({
   api_key: process.env.DATADOG_API_KEY,
 });
 
@@ -19,11 +19,14 @@ const sendMetricsToDatadog = async (payload) => {
   const metricsWithValues = payload.filter((data) => ![undefined, null].includes(data.points[0][1]));
   return new Promise((resolve, reject) => {
     try {
-      dapi.metric.send_all(metricsWithValues, (resp) => resolve(resp));
+      dogapi.metric.send_all(metricsWithValues, (resp) => resolve(resp));
     } catch (error) {
       reject(error);
     }
   });
 };
 
-module.exports = {sendMetricsToDatadog, generateMetricsPayload};
+export {
+  sendMetricsToDatadog,
+  generateMetricsPayload
+};

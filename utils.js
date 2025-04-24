@@ -22,7 +22,7 @@ const kebabToCamel = (str) => {
     .join('');
 };
 
-module.exports = {
+export {
   sleep,
   setAsyncInterval,
   kebabToCamel,
